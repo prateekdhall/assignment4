@@ -5,5 +5,21 @@
       <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
 type: string]]></types:shape>
     </types:type>
+    <types:type name="input" format="json">
+      <types:shape format="weave" example="examples/input.json"><![CDATA[%dw 2.0
+
+type input = {|
+  data: Array<{|    Name: String,     accno: String,     age: String,     ssn: String  |}>
+|} {"example": "{\\\"data\\\":[{\\\"Name\\\":\\\"Srinivas\\\",\\\"accno\\\":\\\"1234567\\\",\\\"age\\\":\\\"30\\\",\\\"ssn\\\":\\\"1234567\\\"}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="output" format="json">
+      <types:shape format="weave" example="examples/output.json"><![CDATA[%dw 2.0
+
+type output = Array<{|  Name: String,   accno: String,   age: String,   ssn: String|}> {"example": "[{\\\"Name\\\":\\\"Srinivas\\\",\\\"accno\\\":\\\"1234567\\\",\\\"age\\\":\\\"30\\\",\\\"ssn\\\":\\\"1234567\\\"}]"}
+
+]]></types:shape>
+    </types:type>
   </types:catalog>
 </types:mule>

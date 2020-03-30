@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+<flow name="exception-masked-senstive-data-Flow" doc:id="0c0c9138-4fe3-43af-ac35-82cc82f15d36" >
+		<http:listener doc:name="Listener" doc:id="8af4e57d-4e99-4249-a05d-51102b2abdd7" config-ref="HTTP_Listener_config" path="/exceptionandmaskflow">
+			<http:error-response statusCode="#[vars.statusCode]" reasonPhrase="#[vars.reasonsPhrase]" >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<ee:transform doc:name="Transform Message" doc:id="d7b52016-12e2-4385-ae39-176a4a07243a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="d4935fbe-0133-4bc2-b27b-fd935784e0c3" >
+			<when expression="#[sizeOf(payload) == 0]">
+				<raise-error doc:name="Raise error" doc:id="e8a4fbe0-ac98-4e23-9dd3-e3406b21947c" type="DATA:BLANK_PAYLOAD"/>
+			</when>
+			<when expression='#[payload.data[0].accno == ""]'>
+				<raise-error doc:name="Raise error" doc:id="c8aa8fe5-bbf9-4e82-af1f-3f4e344a2423" type="DATA:INVALID"/>
+			</when>
+		</choice>
+		<async doc:name="Async" doc:id="e3a9423b-4605-4b34-af5b-ba19645f020a" >
+			<ee:transform doc:name="Transform Message" doc:id="b36ef7a1-5e4c-4ab3-807e-86dc6823aaf9" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	data: payload.data map ( datum , indexOfDatum ) -> {
+		Name: datum.Name,
+		age: datum.age,
+		accno: "*******",
+		ssn: "*******"
+	}
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="e481df1f-441d-440c-8a65-4b81b60e70da" message="#[payload]"/>
+		</async>
+		<ee:transform doc:name="Transform Message" doc:id="ba409476-60e7-4e32-95d4-1afb87a82632" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	data: payload.data map ( datum , indexOfDatum ) -> {
+		Name: datum.Name,
+		accno: datum.accno,
+		age: datum.age,
+		ssn: datum.ssn
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="06af43ec-c0da-4c77-b743-7286153498ef" type="DATA:BLANK_PAYLOAD">
+				<ee:transform doc:name="Transform Message" doc:id="7e8673b5-1238-48ba-84e1-fe05d425cbec" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Payload can not be blank"
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="statusCode" ><![CDATA[400]]></ee:set-variable>
+						<ee:set-variable variableName="reasonsPhrase" ><![CDATA["BLANK_PAYLOAD"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6a05ba1e-d8ed-439e-abaf-c80541a77bd1" type="DATA:INVALID">
+				<ee:transform doc:name="Transform Message" doc:id="218d4a2a-9921-4f22-8a49-677ab813577d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "account number is mandatory"
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="statusCode" ><![CDATA[401]]></ee:set-variable>
+						<ee:set-variable variableName="reasonsPhrase" ><![CDATA["UNAUTHORIZED"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4e38b724-31ef-41cd-878b-9155414f70cd" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="7e5df74f-6379-44f1-a692-6c77f7124c0e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": error.errorMessage
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
