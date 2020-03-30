@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:company-accounts-api="http://www.mulesoft.org/schema/mule/company-accounts-api" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/company-accounts-api http://www.mulesoft.org/schema/mule/company-accounts-api/current/mule-company-accounts-api.xsd">
+	<flow name="getSFDCaccounts" doc:id="a08b636b-28d6-4c15-be97-705fe9caccd8" >
+		<http:listener doc:name="GET /sfdc" doc:id="fd2712f4-e925-4468-aba9-cce92cabdf5d" config-ref="HTTP_Listener_config" path="/sfdc"/>
+		<salesforce:query doc:name="Account" doc:id="bc70e256-68df-42a7-8479-f5c5fbaf78d1" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query >SELECT Name, LastModifiedDate, BillingPostalCode
+FROM Account</salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="0d0656b4-4bf6-480b-b9a9-e3fa8b6c204a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getCompanyAccounts" doc:id="265d66e0-8829-4ffe-a4c7-ceaaf93c1afb" >
+		<http:listener doc:name="GET /accounts" doc:id="2f02b17e-d39c-4a99-b32c-e28842689f33" config-ref="HTTP_Listener_config" path="/accounts"/>
+		<flow-ref doc:name="Flow Reference" doc:id="fc06b0f9-033c-4073-81d0-40bb1a6a67e7" name="setCode"/>
+		<company-accounts-api:get-accounts doc:name="Get accounts" doc:id="5e3214d3-706a-4bd0-b7a8-fa711b0314ee" client-id="${account.client_id}" client-secret="${account.client_secret}" config-ref="Company_Accounts_API_Config" status="#[vars.status]"/>
+	</flow>
+	<sub-flow name="setCode" doc:id="a7b269df-1556-4587-8bc2-c801d1b5f896" >
+		<set-variable value="#[message.attributes.queryParams.code default 'Active']" doc:name="Set Variable" doc:id="2a0a0341-53dd-4197-a114-843379730157" variableName="status"/>
+	</sub-flow>
+</mule>

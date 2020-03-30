@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:company-accounts-api="http://www.mulesoft.org/schema/mule/company-accounts-api"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/company-accounts-api http://www.mulesoft.org/schema/mule/company-accounts-api/current/mule-company-accounts-api.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="cda8e5c7-c7f7-4811-bbf3-3627b3ffd9d1" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="de6c6fb5-da14-4ea6-af0d-43ce39ccdc2e" >
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="e8987187-3eb8-4429-bc6c-1dfbab09e038" >
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="4203e88b-5e83-4661-a5a9-f612872871ed" >
+		<vm:queues >
+			<vm:queue queueName="goodbye" />
+		</vm:queues>
+	</vm:config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="8a4bba9c-a9f9-4e2f-8e39-e1df2486562a" >
+		<salesforce:cached-basic-connection username="${sfdc1.username}" password="${sfdc1.password}" securityToken="${sfdc1.token}" />
+	</salesforce:sfdc-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="f6818ded-475e-4d8b-853c-791afc9eb456" file="config.yaml" />
+	<company-accounts-api:config name="Company_Accounts_API_Config" doc:name="Company Accounts API Config" doc:id="1d35d6da-b069-4268-ab3d-af8c6d1fd4af" property_host="${account.host}" property_port="${account.port}" property_basePath="${account.basepath}" property_protocol="${account.protocol}"/>
+	<http:request-config name="HTTP_Request_config_training" doc:name="HTTP Request configuration" doc:id="b373e088-853a-4d74-8d5c-23bb9832676a" basePath="${training.basepath}" >
+		<http:request-connection host="${training.host}" port="${training.port}" />
+	</http:request-config>
+	<wsc:config name="Soap_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="3ac01ccf-d3e9-4d22-b5ae-c96a8e3cec5c" >
+		<wsc:connection wsdlLocation="${soapservice.wsdl}" service="${soapservice.service}" soapVersion="SOAP12" port="${soapservice.port}" address="${soapservice.address}"/>
+	</wsc:config>
+	
+</mule>

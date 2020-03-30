@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="consumeWebserviceFlow" doc:id="09ffc747-ac0a-4995-9e9a-eb9bd2975935" >
+		<http:listener doc:name="Listener" doc:id="c46ea8ff-ac01-4880-9174-f5aae44b9cc8" config-ref="HTTP_Listener_config" path="/consumewebservice"/>
+		<flow-ref doc:name="Flow Reference" doc:id="b8a7af0b-d516-444c-afbf-eaa26ce26504" name="setCodeVal"/>
+		<http:request method="GET" doc:name="Get flights" doc:id="7a66ea5d-f5d7-419a-b3ea-387363713640" config-ref="HTTP_Request_config_training" path="/united/flights/{dest}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"dest" : vars.code
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+	<sub-flow name="setCodeVal" doc:id="c3e0c23f-d070-45ae-a1db-bd639b6ed905" >
+		<set-variable value="#[message.attributes.queryParams.code]" doc:name="Set Variable" doc:id="927d07bd-0370-46bb-8d7f-064611e105ab" variableName="code"/>
+	</sub-flow>
+</mule>

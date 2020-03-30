@@ -1,0 +1,27 @@
+http:
+  port: "8081"
+  
+sfdc1:
+  username: "prateek.dhal@publicissapient.com"
+  password: "Nokia@1012"
+  token: "639SBfTEUAH0UaQaZP91AExyL"
+  
+account:
+  host: "companyaccounts-api-prateek.us-e2.cloudhub.io"
+  port: "80"
+  basepath: "/"
+  protocol: "HTTP"
+  client_id: "e2278627c05d4a9b9447e5c4d51d6f9e"
+  client_secret: "72287414919f42A1acBc7B2dfd58aC3d"
+
+training:
+  host: "mu.learn.mulesoft.com"
+  port: "80"
+  basepath: "/"
+  protocol: "HTTP"
+  
+soapservice:
+  wsdl: "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL"
+  service: "CountryInfoService"
+  port: "CountryInfoServiceSoap12"
+  address: "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso"

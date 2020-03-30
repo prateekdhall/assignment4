@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<flow name="consumeSoapService" doc:id="f154bf8c-27d4-400a-9907-7e1f73ca750d" >
+		<http:listener doc:name="GET /consumesoapservice" doc:id="6f3aa325-1f27-4ebc-b0d7-0735a2577b1e" config-ref="HTTP_Listener_config" path="/consumesoapservice"/>
+		<wsc:consume doc:name="Consume" doc:id="c4dbde0c-aeab-41c1-a22d-d85a46e39f9b" config-ref="Soap_Service_Consumer_Config" operation="FullCountryInfoAllCountries"/>
+	</flow>
+</mule>
